@@ -1,13 +1,21 @@
 package com.example.dna.service;
 
+import java.util.List;
 import java.util.Random;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.dna.entity.DNA;
+import com.example.dna.entity.Human;
+import com.example.dna.entity.Stats;
+import com.example.dna.repository.HumanRepository;
 
 @Service
 public class DNAService {
+	
+	@Autowired
+	private HumanRepository humanRepository;
 
 	public boolean checkMutation(DNA dna) {
 		// Convert array to matrix
@@ -147,4 +155,24 @@ public class DNAService {
 		return checkMutation(matrix);
 		
 	}
+	
+	public Stats getStats() {
+		int countMutation = 0;
+		int countNoMutation = 0;
+		double ratio = 0.0;
+		
+		List<Human> humanList = humanRepository.findAll();
+		for (int i = 0; i < humanList.size(); i++) {
+			if (humanList.get(i).isMutation())
+				countMutation++;
+			else
+				countNoMutation++;
+		}
+		
+		ratio = countMutation / (countNoMutation == 0 ? 1 : countNoMutation);
+		
+		return new Stats(countMutation, countNoMutation, ratio);
+		
+	}
+
 }
